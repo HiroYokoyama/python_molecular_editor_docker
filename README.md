@@ -1,4 +1,4 @@
-# mMoleditPy for Docker
+# Dockerfile for MoleditPy
 
 ## 概要
 
