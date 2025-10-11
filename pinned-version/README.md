@@ -65,8 +65,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 ```txt
 # requirements.txt の例
-moleditpy-linux==1.2.3
-PyQt6==6.7.0
+moleditpy-linux==1.2.6.2
+PyQt6==6.9.1
 ...
 ```
 
