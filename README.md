@@ -28,7 +28,7 @@ LinuxのGUIアプリケーションをDockerコンテナで動作させるには
 
 ```bash
 git clone https://github.com/HiroYokoyama/python_molecular_editor_docker.git
-cd moleditpy-app
+cd python_molecular_editor_docker
 ```
 
 ### 2\. Dockerイメージをビルド
