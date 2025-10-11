@@ -27,10 +27,10 @@
 
 ### a) ベースイメージ (Base Image Digest)
 
-[cite\_start]`Dockerfile`の最初の行で、ベースイメージをタグ (`3.11-slim`) だけでなく、**ダイジェスト (`@sha256:...`)** で指定しています [cite: 1]。
+`Dockerfile`の最初の行で、ベースイメージをタグ (`3.11-slim`) だけでなく、**ダイジェスト (`@sha256:...`)** で指定しています。
 
 ```dockerfile
-[cite_start]FROM python:3.11-slim@sha256:5e9093a415c674b51e705d42dde4dd6aad8c132dab6ca3e81ecd5cbbe3689bd2 [cite: 1]
+FROM python:3.11-slim@sha256:5e9093a415c674b51e705d42dde4dd6aad8c132dab6ca3e81ecd5cbbe3689bd2
 ```
 
   * **タグ**は移動可能なラベルであり、時間と共に新しいイメージを指す可能性があります。
@@ -38,7 +38,7 @@
 
 ### b) OSパッケージ (apt)
 
-[cite\_start]`RUN apt-get install` コマンドでインストールする全てのライブラリについて、`パッケージ名=バージョン` の形式で正確なバージョンを指定しています [cite: 1, 2]。
+`RUN apt-get install` コマンドでインストールする全てのライブラリについて、`パッケージ名=バージョン` の形式で正確なバージョンを指定しています。
 
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,16 +49,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 ```
 
-[cite\_start]これらのバージョンは、`apt-cache policy <パッケージ名>` コマンドを使ってベースイメージ内で特定されたものです。`t64` のようなサフィックスも、システムのアーキテクチャに合わせた厳密な指定です [cite: 2]。
+これらのバージョンは、`apt-cache policy <パッケージ名>` コマンドを使ってベースイメージ内で特定されたものです。`t64` のようなサフィックスも、システムのアーキテクチャに合わせた厳密な指定です。
 
 ### c) Pythonパッケージ (pip)
 
-[cite\_start]Pythonの依存関係は `requirements.txt` ファイルで管理されます。`pip install` コマンドはこのファイルを参照して、指定されたバージョンのパッケージをインストールします [cite: 3]。
+Pythonの依存関係は `requirements.txt` ファイルで管理されます。`pip install` コマンドはこのファイルを参照して、指定されたバージョンのパッケージをインストールします。
 
 ```dockerfile
-[cite_start]COPY requirements.txt . [cite: 2]
+COPY requirements.txt . 
 RUN pip install --no-cache-dir --upgrade pip && \
-    [cite_start]pip install --no-cache-dir -r requirements.txt [cite: 3]
+    pip install --no-cache-dir -r requirements.txt
 ```
 
 `requirements.txt` は通常、`pip freeze` コマンドで生成され、`moleditpy` 本体だけでなく、`PyQt6` などの間接的な依存関係もすべてバージョン固定でリストアップします。
