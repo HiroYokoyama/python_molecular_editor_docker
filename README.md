@@ -2,7 +2,7 @@
 
 ## 概要
 
-このリポジトリは、GUIアプリケーション `moleditpy` をDockerコンテナ上で実行するための環境を構築する `Dockerfile` を提供します。
+このリポジトリは、GUIアプリケーション [`moleditpy`](https://github.com/HiroYokoyama/python_molecular_editor) をDockerコンテナ上で実行するための環境を構築する `Dockerfile` を提供します。
 
 LinuxのGUIアプリケーションをDockerコンテナで動作させるには、ベースとなるOSイメージに含まれていない多数のグラフィックス、ウィンドウシステム、および入力関連のシステムライブラリが必要です。この `Dockerfile` は、`moleditpy` を安定して実行するために必要な依存関係をすべてインストールし、再現性の高い環境を作成します。
 
