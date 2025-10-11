@@ -27,7 +27,7 @@ LinuxのGUIアプリケーションをDockerコンテナで動作させるには
 ### 1\. リポジトリをクローン
 
 ```bash
-git clone https://github.com/HiroYokoyama/python_molecular_editor_docker
+git clone https://github.com/HiroYokoyama/python_molecular_editor_docker.git
 cd moleditpy-app
 ```
 
