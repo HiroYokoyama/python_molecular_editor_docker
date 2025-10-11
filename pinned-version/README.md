@@ -1,4 +1,4 @@
-# README - Pinned Version for Reproducible Builds
+# Pinned Version for Reproducible Builds
 
 このドキュメントは、依存関係のバージョンを完全に固定（ピニング）した `moleditpy-app` の `Dockerfile` について解説します。
 
