@@ -87,6 +87,7 @@ PyQt6==6.9.1
     docker run --rm -it \
            -e DISPLAY=$DISPLAY \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
+           -v moleditpy-data:/data \
            moleditpy-app:pinned
     ```
 
