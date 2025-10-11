@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6 \
     libice6 \
     libxext6 \
-    libxt6 \
     libxi6 \
     libxkbcommon0 \
     libfontconfig1 \
