@@ -60,7 +60,7 @@ docker build -t moleditpy-app .
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v moleditpy-data:/data \
-    -v moleditpy-setting:/home/.moleditpy \
+    -v moleditpy-setting:/root/.moleditpy \
     moleditpy-app
     ```
 
