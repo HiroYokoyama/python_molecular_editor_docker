@@ -30,4 +30,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 VOLUME /data
 
+WORKDIR /data
+
 CMD ["moleditpy"]
