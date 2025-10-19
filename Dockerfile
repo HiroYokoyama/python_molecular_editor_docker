@@ -29,4 +29,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 VOLUME /data
 
+WORKDIR /data
+
 CMD ["moleditpy"]
