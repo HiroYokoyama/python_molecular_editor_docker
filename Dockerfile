@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
     RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir moleditpy-linux
+    pip install --no-cache-dir pyqt6==6.9.1 pyvista==0.46.4 moleditpy-linux
 
 VOLUME /data
 
