@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
     RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir matplotlib==3.10.7 moleditpy-linux==1.12.5 numpy==2.3.4 PyQt6==6.9.1 PyQt6-Qt6==6.9.2 PyQt6_sip==13.10.2 pyvista==0.46.4 pyvistaqt==0.11.3 QtPy==2.4.3 rdkit==2025.9.1 vtk==9.5.2
+    pip install --no-cache-dir matplotlib==3.10.7 moleditpy-linux==1.13.0 numpy==2.3.4 PyQt6==6.9.1 PyQt6-Qt6==6.9.2 PyQt6_sip==13.10.2 pyvista==0.46.4 pyvistaqt==0.11.3 QtPy==2.4.3 rdkit==2025.9.1 vtk==9.5.2
 
 VOLUME /data
 
