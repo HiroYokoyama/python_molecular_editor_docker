@@ -1,75 +1,75 @@
-# Docker版 Python Molecular Editor: ファイルをホストPCに保存するためのバインドマウント設定ガイド
+# Docker Version of Python Molecular Editor: Bind Mount Configuration Guide for Saving Files to the Host PC
 
-このドキュメントは、Dockerコンテナとして実行する「Python Molecular Editor」で作成したファイルを、ホストPC上の指定フォルダに永続的に保存するための技術的な手順を解説します。
+This document explains the technical procedures for permanently saving files created in the "Python Molecular Editor" running as a Docker container to a specified folder on your host PC.
 
-## 1\. 目的
+## 1. Purpose
 
-Dockerコンテナは、デフォルトではステートレス（状態を持たない）です。コンテナ内でGUIアプリケーションを使いファイルを作成しても、コンテナを削除 (`docker rm`) するとそのファイルは失われます。
+By default, Docker containers are stateless. Any files created using GUI applications inside the container will be lost once the container is deleted (`docker rm`).
 
-この問題を解決するため、ホストPCのフォルダをコンテナ内の特定のフォルダに直接接続（**バインドマウント**）します。これにより、コンテナ内のアプリケーションから見ると通常のフォルダとしてファイルを保存でき、その実体はホストPC上に永続的に保管されます。
+To solve this problem, we directly connect (**bind mount**) a folder on the host PC to a specific folder inside the container. This allows the application inside the container to save files to what appears to be a normal folder, while the actual files are stored persistently on the host PC.
 
-## 2\. 前提条件
+## 2. Prerequisites
 
-  - DockerがホストPCにインストールされていること。
-  - **（重要）GUIアプリケーションをコンテナから表示するためのX Window System環境が準備されていること。**
-      - **macOS:** [XQuartz](https://www.xquartz.org/) がインストール・実行されていること。
-      - **Windows:** [WSL2](https://learn.microsoft.com/ja-jp/windows/wsl/install) と、VcXsrvや、WSLgが有効なWindows 11環境が準備されていること。
-      - **Linux:** 通常は追加設定不要です。
+  - Docker must be installed on the host PC.
+  - **(Important) An X Window System environment must be prepared to display GUI applications from the container.**
+      - **macOS:** [XQuartz](https://www.xquartz.org/) must be installed and running.
+      - **Windows:** [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) with VcXsrv or a Windows 11 environment with WSLg enabled must be prepared.
+      - **Linux:** Usually requires no additional configuration.
 
-## 3\. 設定手順
+## 3. Configuration Steps
 
-### Step 1: ホストPCにデータ保存用フォルダを作成
+### Step 1: Create a Folder for Data Storage on the Host PC
 
-まず、コンテナから保存されるファイルを受け取るための専用フォルダをホストPC上に作成します。ここでは例として、デスクトップに`molecular-data`という名前のフォルダを作成します。
+First, create a dedicated folder on the host PC to receive the files saved from the container. As an example, we will create a folder named `molecular-data` on the desktop.
 
 ```bash
-# デスクトップに移動 (環境に合わせてパスを調整してください)
+# Go to the Desktop (adjust the path to match your environment)
 cd ~/Desktop
 
-# データ保存用フォルダを作成
+# Create a folder for data storage
 mkdir molecular-data
 ```
 
-この`molecular-data`フォルダが、コンテナとの共有ポイントになります。
+This `molecular-data` folder will serve as the shared point with the container.
 
-### Step 2: `docker run` コマンドでバインドマウントを実行
+### Step 2: Run the `docker run` Command with a Bind Mount
 
-`docker run`コマンドに`-v`オプションを追加して、Step 1で作成したフォルダとコンテナ内のフォルダを接続します。
+Add the `-v` option to the `docker run` command to connect the folder created in Step 1 to a folder inside the container.
 
-#### 基本コマンド構造
+#### Basic Command Structure
 
 ```bash
 docker run -it --rm \
-  -v <ホストの絶対パス>:<コンテナの絶対パス> \
-  <GUI接続設定> \
-  <イメージ名>
+  -v <absolute_path_on_host>:<absolute_path_in_container> \
+  <gui_connection_settings> \
+  <image_name>
 ```
 
-  - `-v` : ボリューム（ここではバインドマウント）を指定するオプション。
-  - `<ホストの絶対パス>` : 先ほど作成した `molecular-data` フォルダのフルパス。
-  - `<コンテナの絶対パス>` : コンテナ内からこのフォルダが見える場所。ユーザーのホームディレクトリ内などが分かりやすいでしょう。例: `/home/user/data`
-  - `<GUI接続設定>` : X Window Systemへ接続するための環境変数やネットワーク設定。
-  - `<イメージ名>` : Python Molecular Editorが含まれるDockerイメージ名。（例: `pme-image:latest`）
+  - `-v`: Option to specify a volume (bind mount in this case).
+  - `<absolute_path_on_host>`: The full path to the `molecular-data` folder created earlier.
+  - `<absolute_path_in_container>`: The location inside the container where this folder will be visible. Placing it in the user's home directory makes it easy to find. Example: `/home/user/data` or `/data`.
+  - `<gui_connection_settings>`: Environment variables or network settings to connect to the X Window System.
+  - `<image_name>`: The name of the Docker image containing Python Molecular Editor (e.g., `pme-image:latest`).
 
-### Step 3: プラットフォーム別の実行コマンド
+### Step 3: Run Commands by Platform
 
-お使いのOSに応じて、以下のコマンドを実行します。
-ここでは、ホストの `~/Desktop/molecular-data` をコンテナ内の `/data` にマウントする例を示します。
+Run the command corresponding to your OS.
+The following examples mount the host's `~/Desktop/molecular-data` to `/data` inside the container.
 
 -----
 
-#### **macOS (XQuartzを使用)**
+#### **macOS (Using XQuartz)**
 
-XQuartzを起動し、セキュリティ設定で「ネットワーク・クライアントからの接続を許可」にチェックを入れてください。
+Launch XQuartz and ensure "Allow connections from network clients" is checked in the security settings.
 
 ```bash
-# ターミナルでIPアドレスを取得
+# Get the IP address in the terminal
 IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
 
-# 接続を許可
+# Allow connection
 xhost + $IP
 
-# Dockerコンテナを起動
+# Run the Docker container
 docker run -it --rm \
   -v ~/Desktop/molecular-data:/data \
   -e DISPLAY=${IP}:0 \
@@ -78,12 +78,12 @@ docker run -it --rm \
 
 -----
 
-#### **Windows (WSL2 + WSLgを使用)**
+#### **Windows (Using WSL2 + WSLg)**
 
-Windows 11のWSLg環境では、GUI設定が自動化されており非常にシンプルです。
+Under Windows 11 WSLg, GUI settings are automated and very simple.
 
 ```bash
-# WSLのターミナルから実行
+# Run from the WSL terminal
 docker run -it --rm \
   -v /mnt/c/Users/<Your-Username>/Desktop/molecular-data:/data \
   -e DISPLAY=$DISPLAY \
@@ -91,19 +91,19 @@ docker run -it --rm \
   pme-image:latest
 ```
 
-*注意: `<Your-Username>`はご自身のWindowsユーザー名に置き換えてください。*
+*Note: Replace `<Your-Username>` with your actual Windows username.*
 
 -----
 
 #### **Linux**
 
-最もシンプルに実行できます。
+This is the simplest setup to run.
 
 ```bash
-# 接続を許可 (必要な場合)
+# Allow connection (if necessary)
 xhost +local:
 
-# Dockerコンテナを起動
+# Run the Docker container
 docker run -it --rm \
   -v ~/Desktop/molecular-data:/data \
   -e DISPLAY=$DISPLAY \
@@ -111,24 +111,24 @@ docker run -it --rm \
   pme-image:latest
 ```
 
-## 4\. コンテナ内での操作
+## 4. Operation Inside the Container
 
-上記コマンドでコンテナを起動すると、Python Molecular EditorのGUIが表示されます。
+When you start the container using the command above, the Python Molecular Editor GUI will open.
 
-1.  アプリケーション内で分子モデルを作成または編集します。
-2.  メニューから「ファイル」→「名前を付けて保存」を選択します。
-3.  ファイル保存ダイアログが表示されたら、コマンドで指定したマウント先のディレクトリ（この例では `/data`）に移動します。
-4.  任意のファイル名（例: `caffeine.xyz`）で保存します。
-5.  保存が完了すると、ホストPCのデスクトップにある`molecular-data`フォルダ内に`caffeine.xyz`ファイルが作成されていることが確認できます。
+1.  Create or edit a molecular model within the application.
+2.  Select "File" -> "Save As..." from the menu.
+3.  When the file save dialog appears, navigate to the mount destination directory specified in the command (in this example, `/data`).
+4.  Save the file with any name (e.g., `caffeine.xyz`).
+5.  Once saved, you can verify that the `caffeine.xyz` file has been created inside the `molecular-data` folder on your host PC's desktop.
 
-コンテナを`exit`コマンドやウィンドウを閉じて終了（`--rm`オプションにより自動削除）しても、ホストPC上のファイルは完全に保持されます。
+Even if you exit the container (using the `exit` command or closing the window, which automatically deletes the container due to the `--rm` option), the files on your host PC are completely preserved.
 
-## 5\. まとめ
+## 5. Summary
 
-| オプション | 役割 |
+| Option | Role |
 | :--- | :--- |
-| **`-v <HOST_PATH>:<CONTAINER_PATH>`** | **バインドマウントの核となる設定。** ホストとコンテナのファイルシステムを双方向に同期させる。 |
-| **`-e DISPLAY=...`** | **GUI表示に必須。** コンテナ内のGUIアプリケーションの描画先（ホストのディスプレイ）を指示する。 |
-| **`-v /tmp/.X11-unix...`** | **GUI表示に必須。** Xサーバーとの通信ソケットをコンテナと共有する。 |
+| **`-v <HOST_PATH>:<CONTAINER_PATH>`** | **Core setting for bind mounting.** Bi-directionally synchronizes files between the host and the container. |
+| **`-e DISPLAY=...`** | **Required for GUI display.** Tells GUI applications inside the container where to draw (pointing to the host's display). |
+| **`-v /tmp/.X11-unix...`** | **Required for GUI display.** Shares the communication socket with the X server between the host and the container. |
 
-この手順により、Dockerのポータビリティと隔離性の恩恵を受けつつ、GUIアプリケーションで生成した重要なデータを安全かつ永続的に管理することが可能になります。
+By following this procedure, you can safely and permanently manage the important data generated by the GUI application while benefiting from Docker's portability and isolation.

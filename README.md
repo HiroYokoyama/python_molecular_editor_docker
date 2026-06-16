@@ -1,59 +1,59 @@
 # Dockerfile for MoleditPy
 
-## 概要
+## Overview
 
-このリポジトリは、GUIアプリケーション [`moleditpy`](https://github.com/HiroYokoyama/python_molecular_editor) をDockerコンテナ上で実行するための環境を構築する `Dockerfile` を提供します。
+This repository provides a `Dockerfile` to set up an environment for running the GUI application [`moleditpy`](https://github.com/HiroYokoyama/python_molecular_editor) inside a Docker container.
 
-LinuxのGUIアプリケーションをDockerコンテナで動作させるには、ベースとなるOSイメージに含まれていない多数のグラフィックス、ウィンドウシステム、および入力関連のシステムライブラリが必要です。この `Dockerfile` は、`moleditpy` を安定して実行するために必要な依存関係をすべてインストールし、再現性の高い環境を作成します。
+Running Linux GUI applications inside a Docker container requires many graphics, window system, and input-related system libraries that are not included in the base OS image. This `Dockerfile` installs all the necessary dependencies to run `moleditpy` stably and creates a highly reproducible environment.
 
-## 主な特徴
+## Key Features
 
-  * **Python 3.11** の実行環境
-  * `moleditpy-linux` アプリケーションのインストール
-  * GUIアプリケーションの実行に不可欠なシステムライブラリ群：
-      * **グラフィックス関連:** OpenGL, Mesa, EGL (`libgl1`, `libglu1-mesa`, `libegl1` など) 
-      * **X11/XCB関連:** ウィンドウ管理、キーボード・マウス入力、ディスプレイ通信 (`libx11-xcb1`, `libxkbcommon-x11-0`, 多数の `libxcb-*` ライブラリなど)
-      * **コアライブラリ:** フォント設定やイベントループ (`libfontconfig1`, `libglib2.0-0` など) 
+  * **Python 3.11** runtime environment
+  * Installation of the `moleditpy-linux` application
+  * System libraries essential for running GUI applications:
+      * **Graphics-related:** OpenGL, Mesa, EGL (such as `libgl1`, `libglu1-mesa`, `libegl1`) 
+      * **X11/XCB-related:** Window management, keyboard/mouse input, and display communication (such as `libx11-xcb1`, `libxkbcommon-x11-0`, and various `libxcb-*` libraries)
+      * **Core libraries:** Font configuration and event loops (such as `libfontconfig1`, `libglib2.0-0`) 
 
-## 前提条件
+## Prerequisites
 
-  * [Docker](https://www.docker.com/get-started) がインストールされていること。
-  * **Linux:** 標準のデスクトップ環境。
-  * **macOS:** [XQuartz](https://www.xquartz.org/) がインストール・設定されていること。
-  * **Windows:** [VcXsrv](https://sourceforge.net/projects/vcxsrv/) や、WSL2のGUIサポート (WSLg) が有効であること。
+  * [Docker](https://www.docker.com/get-started) must be installed.
+  * **Linux:** Standard desktop environment.
+  * **macOS:** [XQuartz](https://www.xquartz.org/) must be installed and configured.
+  * **Windows:** [VcXsrv](https://sourceforge.net/projects/vcxsrv/) or WSL2 GUI support (WSLg) must be enabled.
 
-## 使い方
+## How to Use
 
-### 1\. リポジトリをクローン
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/HiroYokoyama/python_molecular_editor_docker.git
 cd python_molecular_editor_docker
 ```
 
-### 2\. Dockerイメージをビルド
+### 2. Build the Docker Image
 
-`Dockerfile` があるディレクトリで、以下のコマンドを実行して `moleditpy-app` という名前のDockerイメージをビルドします。
+Run the following command in the directory containing the `Dockerfile` to build a Docker image named `moleditpy-app`.
 
 ```bash
 docker build -t moleditpy-app .
 ```
 
-### 3\. コンテナを実行 (GUI表示)
+### 3. Run the Container (with GUI Display)
 
-コンテナ内のGUIをホストマシン（あなたのPC）の画面に表示するには、特別な設定が必要です。
+Special configuration is required to display the GUI from inside the container on your host machine (your PC).
 
-#### Linuxホストの場合
+#### For Linux Hosts
 
-1.  **(初回のみ)コンテナからの接続を許可**
-    ホストのターミナルで以下のコマンドを実行します。
+1.  **(First time only) Allow connections from the container**
+    Run the following command in your host terminal:
 
     ```bash
     xhost +local:docker
     ```
 
-2.  **コンテナを起動**
-    以下のコマンドでコンテナを起動すると、`moleditpy` のGUIウィンドウがデスクトップに表示されます。
+2.  **Start the container**
+    Start the container using the following command, and the `moleditpy` GUI window will be displayed on your desktop.
 
     ```bash
     docker run --rm -it \
@@ -64,9 +64,9 @@ docker build -t moleditpy-app .
     moleditpy-app
     ```
 
-#### macOS / Windows の場合
+#### For macOS / Windows
 
-基本的なコマンドは同じですが、環境変数 `DISPLAY` の設定が異なる場合があります。（例: `docker.for.mac.host.internal:0` など）
+The basic commands are the same, but the configuration of the `DISPLAY` environment variable may differ (e.g., `docker.for.mac.host.internal:0`, etc.).
 
 -----
 

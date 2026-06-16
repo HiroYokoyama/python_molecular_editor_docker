@@ -1,44 +1,44 @@
 # Pinned Version for Reproducible Builds
 
-このドキュメントは、依存関係のバージョンを完全に固定（ピニング）した `moleditpy-app` の `Dockerfile` について解説します。
+This document explains the `Dockerfile` for `moleditpy-app` where the versions of all dependencies are fully pinned.
 
-このアプローチを採用することで、\*\*「いつでも、誰が、どこでビルドしても、全く同じ環境が構築されること」\*\*を保証します。
+Adopting this approach ensures **"absolute reproducibility: no matter who builds it, when, or where, the exact same environment will be constructed."**
 
-## 1\. バージョン固定（Pinning）とは？
+## 1. What is Version Pinning?
 
-バージョン固定とは、アプリケーションが依存する全てのソフトウェア（ベースイメージ、OSパッケージ、Pythonライブラリなど）のバージョンを、特定の一つに明確に指定することです。
+Version pinning means explicitly specifying a single version for every software component your application depends on (including the base image, OS packages, Python libraries, etc.).
 
-例えば、「`libgl1` をインストールする」という曖昧な指示ではなく、「`libgl1` のバージョン `1.7.0-1+b2` を正確にインストールする」と厳密に指示します。
+For example, instead of a vague instruction like "install `libgl1`," it strictly commands "install version `1.7.0-1+b2` of `libgl1`."
 
-### なぜバージョンを固定するのか？
+### Why Pin Versions?
 
-1.  **絶対的な再現性 (Absolute Reproducibility)**
-    開発、テスト、本番環境で寸分違わぬ同一の環境を保証します。「私のPCでは動いたのに…」という問題を完全に撲滅します。
+1.  **Absolute Reproducibility**
+    Guarantees the exact same environment across development, testing, and production. It completely eliminates the "it worked on my machine..." problem.
 
-2.  **安定性の確保 (Stability)**
-    依存パッケージのマイナーアップデートによって、意図せずアプリケーションが動かなくなる「サイレントな破壊」を防ぎます。今日動くビルドは、1年後も同じように動きます。
+2.  **Ensuring Stability**
+    Prevents "silent breakage" where minor updates of dependency packages inadvertently break the application. A build that works today will work the exact same way a year from now.
 
-3.  **デバッグの容易化 (Easier Debugging)**
-    環境が不変であるため、問題が発生した際に原因が依存関係の更新にある可能性を排除でき、アプリケーション自体のコードに集中してデバッグできます。
+3.  **Easier Debugging**
+    Since the environment is invariant, you can eliminate dependency updates as a source of problems when debugging, allowing you to focus on the application's actual code.
 
-## 2\. このDockerfileにおける実装
+## 2. Implementation in this Dockerfile
 
-このプロジェクトでは、以下の3つのレベルでバージョンを固定しています。
+In this project, versions are pinned at three levels:
 
-### a) ベースイメージ (Base Image Digest)
+### a) Base Image (Base Image Digest)
 
-`Dockerfile`の最初の行で、ベースイメージをタグ (`3.11-slim`) だけでなく、**ダイジェスト (`@sha256:...`)** で指定しています。
+On the first line of the `Dockerfile`, the base image is specified not just by a tag (`3.11-slim`), but by its **digest (`@sha256:...`)**.
 
 ```dockerfile
 FROM python:3.11-slim@sha256:5e9093a415c674b51e705d42dde4dd6aad8c132dab6ca3e81ecd5cbbe3689bd2
 ```
 
-  * **タグ**は移動可能なラベルであり、時間と共に新しいイメージを指す可能性があります。
-  * **ダイジェスト**はイメージの「指紋」であり、イメージの内容と1対1で対応します。これにより、ベースとなるOS環境が未来永劫変わらないことを保証します。
+  * **Tags** are mutable labels and may point to newer images over time.
+  * **Digests** are unique "fingerprints" of the image contents. This ensures the underlying OS environment remains unchanged forever.
 
-### b) OSパッケージ (apt)
+### b) OS Packages (apt)
 
-`RUN apt-get install` コマンドでインストールする全てのライブラリについて、`パッケージ名=バージョン` の形式で正確なバージョンを指定しています。
+For all libraries installed using the `RUN apt-get install` command, the exact version is specified in the format `package_name=version`.
 
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,11 +49,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 ```
 
-これらのバージョンは、`apt-cache policy <パッケージ名>` コマンドを使ってベースイメージ内で特定されたものです。`t64` のようなサフィックスも、システムのアーキテクチャに合わせた厳密な指定です。
+These versions were identified within the base image using the `apt-cache policy <package_name>` command. Suffixes like `t64` are also strictly specified to match the system's architecture.
 
-### c) Pythonパッケージ (pip)
+### c) Python Packages (pip)
 
-Pythonの依存関係は `requirements.txt` ファイルで管理されます。`pip install` コマンドはこのファイルを参照して、指定されたバージョンのパッケージをインストールします。
+Python dependencies are managed via a `requirements.txt` file. The `pip install` command refers to this file to install packages of specific versions.
 
 ```dockerfile
 COPY requirements.txt . 
@@ -61,26 +61,26 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 ```
 
-`requirements.txt` は通常、`pip freeze` コマンドで生成され、`moleditpy` 本体だけでなく、`PyQt6` などの間接的な依存関係もすべてバージョン固定でリストアップします。
+`requirements.txt` is typically generated with the `pip freeze` command, listing the main `moleditpy` package along with all indirect dependencies (like `PyQt6`) with pinned versions.
 
 ```txt
-# requirements.txt の例
+# Example requirements.txt
 moleditpy-linux==1.2.6.2
 PyQt6==6.9.1
 ...
 ```
 
-## 3\. 使い方
+## 3. How to Use
 
-ビルドと実行の方法は通常版と同じですが、この`Dockerfile`を使うことで、常に同じ結果が得られます。
+Building and running the container is done in the same way as the standard version, but using this `Dockerfile` guarantees identical results.
 
-1.  **Dockerイメージをビルドする**
+1.  **Build the Docker image**
 
     ```bash
     docker build -t moleditpy-app:pinned .
     ```
 
-2.  **コンテナを実行する (Linuxの場合)**
+2.  **Run the container (for Linux)**
 
     ```bash
     xhost +local:docker
@@ -91,22 +91,22 @@ PyQt6==6.9.1
            moleditpy-app:pinned
     ```
 
-## 4\. メンテナンス：依存関係の更新方法
+## 4. Maintenance: How to Update Dependencies
 
-バージョンを固定すると、セキュリティアップデートなどが自動で適用されなくなるため、**意図的かつ定期的なメンテナンス**が必要になります。
+Pinning versions means security updates and patches are not automatically applied, necessitating **intentional and periodic maintenance**.
 
-1.  **ベースイメージの更新:**
+1.  **Updating the Base Image:**
 
-      * `docker pull python:3.11-slim` を実行して最新版を取得します。
-      * `docker images --digests python:3.11-slim` で新しいダイジェストを調べ、`Dockerfile`の`FROM`行を更新します。
+      * Run `docker pull python:3.11-slim` to fetch the latest version.
+      * Find the new digest using `docker images --digests python:3.11-slim`, and update the `FROM` line in your `Dockerfile`.
 
-2.  **OSパッケージの更新:**
+2.  **Updating OS Packages:**
 
-      * 新しいベースイメージのコンテナを起動し、`apt-cache policy` で各パッケージの最新バージョンを調べ、`Dockerfile`を更新します。
+      * Spin up a container from the new base image, check the latest versions of each package using `apt-cache policy`, and update the `Dockerfile`.
 
-3.  **Pythonパッケージの更新:**
+3.  **Updating Python Packages:**
 
-      * クリーンなPython仮想環境で `pip install --upgrade moleditpy-linux` を実行します。
-      * `pip freeze > requirements.txt` を実行して、`requirements.txt` ファイルを再生成します。
+      * Run `pip install --upgrade moleditpy-linux` in a clean Python virtual environment.
+      * Re-generate `requirements.txt` by running `pip freeze > requirements.txt`.
 
-更新後は、アプリケーションが正しく動作するかを十分にテストしてください。
+Always thoroughly test that the application functions correctly after updating dependencies.
