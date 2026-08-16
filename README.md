@@ -1,5 +1,7 @@
 # Dockerfile for MoleditPy
 
+Repo: [https://github.com/HiroYokoyama/python_molecular_editor_docker/](https://github.com/HiroYokoyama/python_molecular_editor_docker/)
+
 ## Overview
 
 This repository provides a `Dockerfile` to set up an environment for running the GUI application [`moleditpy`](https://github.com/HiroYokoyama/python_molecular_editor) inside a Docker container.
