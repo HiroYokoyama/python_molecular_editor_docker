@@ -57,7 +57,7 @@ Python dependencies are managed via a `requirements.txt` file. The `pip install`
 
 ```dockerfile
 COPY requirements.txt . 
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir pip==26.2.1 && \
     pip install --no-cache-dir -r requirements.txt
 ```
 
@@ -65,8 +65,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 ```txt
 # Example requirements.txt
-moleditpy-linux==1.2.6.2
-PyQt6==6.9.1
+moleditpy-linux==4.11.1
+PyQt6==6.11.0
 ...
 ```
 

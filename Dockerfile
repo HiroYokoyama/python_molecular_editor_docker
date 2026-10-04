@@ -24,8 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxkbcommon-x11-0 \
     && rm -rf /var/lib/apt/lists/*
 
-    RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir matplotlib==3.10.7 moleditpy-linux numpy==2.3.4 PyQt6==6.9.1 PyQt6-Qt6==6.9.2 PyQt6_sip==13.10.2 pyvista==0.46.4 pyvistaqt==0.11.3 QtPy==2.4.3 rdkit==2025.9.1 vtk==9.5.2
+RUN pip install --no-cache-dir pip==26.2.1 && \
+    pip install --no-cache-dir matplotlib==3.11.2 moleditpy-linux==4.11.1 numpy==2.3.5 PyQt6==6.11.0 PyQt6-Qt6==6.11.2 PyQt6_sip==13.12.0 pyvista==0.48.4 pyvistaqt==0.12.0 QtPy==2.4.3 rdkit==2026.3.6 vtk==9.6.2
 
 VOLUME /data
 
