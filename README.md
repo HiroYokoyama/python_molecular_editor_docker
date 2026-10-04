@@ -73,3 +73,18 @@ The basic commands are the same, but the configuration of the `DISPLAY` environm
 -----
 
 *This Dockerfile was constructed through an iterative debugging process, ensuring that all necessary dependencies for the Qt-based GUI application are included.*
+
+## CI and Releases
+
+GitHub Actions builds both Docker images and checks that `moleditpy --version`
+reports `4.11.1` on pushes and pull requests targeting `main`.
+
+To publish a release, push a semantic-version tag beginning with `v`:
+
+```bash
+git tag v4.11.1
+git push origin v4.11.1
+```
+
+The release workflow reruns the Docker smoke tests and publishes the GitHub
+Release only after they pass.

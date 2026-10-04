@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  docker-smoke:
+    uses: ./.github/workflows/docker-smoke.yml
+    with:
+      expected_version: ${{ github.ref_name }}
+    permissions:
+      contents: read
+
+  publish:
+    name: Publish GitHub release
+    needs: docker-smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish release from tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" --verify-tag --generate-notes --title "Release ${GITHUB_REF_NAME}"

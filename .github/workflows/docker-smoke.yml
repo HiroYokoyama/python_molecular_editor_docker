@@ -1,0 +1,42 @@
+name: Docker smoke tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      expected_version:
+        description: Version that moleditpy must report
+        required: false
+        default: '4.11.1'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  docker-smoke:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: default image
+            dockerfile: Dockerfile
+            context: .
+            image: moleditpy-docker-smoke-default
+          - name: pinned image
+            dockerfile: pinned-version/Dockerfile
+            context: pinned-version
+            image: moleditpy-docker-smoke-pinned
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build image and check version
+        run: bash tests/docker_smoke.sh "${{ matrix.dockerfile }}" "${{ matrix.context }}" "${{ matrix.image }}" "${{ inputs.expected_version || '4.11.1' }}"
