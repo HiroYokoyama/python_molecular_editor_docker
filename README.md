@@ -6,12 +6,14 @@ Repo: [https://github.com/HiroYokoyama/python_molecular_editor_docker/](https://
 
 This repository provides a `Dockerfile` to set up an environment for running the GUI application [`moleditpy`](https://github.com/HiroYokoyama/python_molecular_editor) inside a Docker container.
 
-Running Linux GUI applications inside a Docker container requires many graphics, window system, and input-related system libraries that are not included in the base OS image. This `Dockerfile` installs all the necessary dependencies to run `moleditpy` stably and creates a highly reproducible environment.
+Running Linux GUI applications inside a Docker container requires many graphics, window system, and input-related system libraries that are not included in the base OS image. This `Dockerfile` installs all the necessary dependencies to run `moleditpy` stably with the required runtime libraries.
 
 ## Key Features
 
   * **Python 3.11** runtime environment
-  * Installation of the `moleditpy-linux` application
+  * Installation of the unified `moleditpy==5.0.1` package with PySide6
+  * `QT_API=pyside6` selects the same binding for QtPy and PyVistaQt
+  * Open Babel is available separately through the optimizer plugin
   * System libraries essential for running GUI applications:
       * **Graphics-related:** OpenGL, Mesa, EGL (such as `libgl1`, `libglu1-mesa`, `libegl1`) 
       * **X11/XCB-related:** Window management, keyboard/mouse input, and display communication (such as `libx11-xcb1`, `libxkbcommon-x11-0`, and various `libxcb-*` libraries)
@@ -72,4 +74,36 @@ The basic commands are the same, but the configuration of the `DISPLAY` environm
 
 -----
 
-*This Dockerfile was constructed through an iterative debugging process, ensuring that all necessary dependencies for the Qt-based GUI application are included.*
+For software rendering on systems where GPU forwarding is unavailable, add
+`-e LIBGL_ALWAYS_SOFTWARE=1` to `docker run`. Persistent settings and plugins are
+stored in `/root/.moleditpy`; molecule files can be kept in `/data`.
+
+## CI and releases
+
+GitHub Actions builds both images and checks the CLI version, pip consistency,
+Qt/xcb runtime libraries, PySide6 selection, RDKit, the application window and
+3D rendering. CI uses Xvfb and software rendering; this does not test every
+host GPU or display-server configuration.
+
+The workflow can also be run manually on a selected branch/ref, with an expected
+application version (default `5.0.1`). This checks the version installed by the
+Dockerfiles; it does not change their package versions.
+
+Run the same checks locally on Linux with Docker and Xvfb installed:
+
+```bash
+bash tests/docker_smoke.sh Dockerfile . moleditpy-smoke 5.0.1
+bash tests/docker_smoke.sh pinned-version/Dockerfile pinned-version moleditpy-smoke-pinned 5.0.1
+```
+
+Without Xvfb, the test uses Qt's offscreen platform. The image itself leaves Qt
+platform selection to the runtime environment and sets no Mesa GL/GLSL override.
+
+For pinned Python dependencies and a fixed base-image digest, see
+[pinned-version](pinned-version/README.md). Debian package revisions are resolved
+from current mirrors, so neither recipe promises byte-for-byte reproducibility.
+
+A `v*.*.*` tag runs both smoke tests before publishing a GitHub release. Keep the
+application version in the Dockerfiles, pinned requirements, workflow defaults
+and tag aligned. Release tags match the application version, for example
+`v5.0.1`. The workflow does not publish an image to a container registry.
