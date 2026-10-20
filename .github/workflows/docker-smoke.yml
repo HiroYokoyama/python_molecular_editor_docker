@@ -1,0 +1,56 @@
+name: Docker smoke tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      expected_version:
+        description: Version that the pinned image must report
+        required: false
+        default: '5.0.1'
+        type: string
+  workflow_call:
+    inputs:
+      expected_version:
+        description: Version that the pinned image must report
+        required: false
+        default: '5.0.1'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  docker-smoke:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: default image
+            dockerfile: Dockerfile
+            context: .
+            image: moleditpy-docker-smoke-default
+            expected_version: latest
+          - name: pinned image
+            dockerfile: pinned-version/Dockerfile
+            context: pinned-version
+            image: moleditpy-docker-smoke-pinned
+            expected_version: pinned
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build image and check application startup
+        env:
+          DOCKERFILE: ${{ matrix.dockerfile }}
+          BUILD_CONTEXT: ${{ matrix.context }}
+          IMAGE: ${{ matrix.image }}
+          EXPECTED_VERSION: ${{ matrix.expected_version == 'latest' && 'latest' || inputs.expected_version || '5.0.1' }}
+        run: bash tests/docker_smoke.sh "$DOCKERFILE" "$BUILD_CONTEXT" "$IMAGE" "$EXPECTED_VERSION"
