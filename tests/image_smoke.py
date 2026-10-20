@@ -41,8 +41,8 @@ errors = []
 def check_window():
     try:
         assert window.isVisible(), "Main window did not become visible"
-        assert window.plotter is not None, "3D view was not initialized"
-        window.plotter.render()
+        assert window.view_3d_manager.plotter is not None, "3D view was not initialized"
+        window.view_3d_manager.plotter.render()
         print("Main window, PySide6/xcb dependencies, RDKit and 3D rendering passed", flush=True)
     except Exception as exc:
         errors.append(exc)
