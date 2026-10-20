@@ -11,7 +11,7 @@ Running Linux GUI applications inside a Docker container requires many graphics,
 ## Key Features
 
   * **Python 3.11** runtime environment
-  * Installation of the unified `moleditpy==5.0.1` package with PySide6
+  * Installation of the latest unified `moleditpy` package with PySide6
   * `QT_API=pyside6` selects the same binding for QtPy and PyVistaQt
   * Open Babel is available separately through the optimizer plugin
   * System libraries essential for running GUI applications:
@@ -86,13 +86,14 @@ Qt/xcb runtime libraries, PySide6 selection, RDKit, the application window and
 host GPU or display-server configuration.
 
 The workflow can also be run manually on a selected branch/ref, with an expected
-application version (default `5.0.1`). This checks the version installed by the
-Dockerfiles; it does not change their package versions.
+version for the pinned image (default `5.0.1`). The default image follows the
+latest compatible packages from PyPI and checks that the CLI reports the installed
+package version. The input does not change package versions.
 
 Run the same checks locally on Linux with Docker and Xvfb installed:
 
 ```bash
-bash tests/docker_smoke.sh Dockerfile . moleditpy-smoke 5.0.1
+bash tests/docker_smoke.sh Dockerfile . moleditpy-smoke latest
 bash tests/docker_smoke.sh pinned-version/Dockerfile pinned-version moleditpy-smoke-pinned 5.0.1
 ```
 
@@ -104,6 +105,7 @@ For pinned Python dependencies and a fixed base-image digest, see
 from current mirrors, so neither recipe promises byte-for-byte reproducibility.
 
 A `v*.*.*` tag runs both smoke tests before publishing a GitHub release. Keep the
-application version in the Dockerfiles, pinned requirements, workflow defaults
-and tag aligned. Release tags match the application version, for example
+pinned application version in its requirements, workflow defaults and tag
+aligned. The rolling image is tested against the version obtained at build time.
+Release tags match the pinned application version, for example
 `v5.0.1`. The workflow does not publish an image to a container registry.

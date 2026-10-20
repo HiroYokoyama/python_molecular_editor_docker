@@ -26,9 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxkbcommon-x11-0 \
     && rm -rf /var/lib/apt/lists/*
 
-ARG MOLEDITPY_VERSION=5.0.1
-RUN python -m pip install --no-cache-dir pip==26.2.1 && \
-    python -m pip install --no-cache-dir "moleditpy==${MOLEDITPY_VERSION}" matplotlib==3.11.2 && \
+RUN python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir moleditpy matplotlib && \
     python -m pip check
 
 ENV QT_API=pyside6

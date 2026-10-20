@@ -33,8 +33,8 @@ requirements and software-rendering options.
 
 Resolve dependencies in a clean Linux x86-64 Python 3.11 environment using the
 intended `moleditpy` release and matplotlib. Replace `requirements.txt` with the
-resolved packages, preserving exact versions. Keep the app version in both
-Dockerfiles, the workflow defaults and the README aligned. PySide6/Shiboken
+resolved packages, preserving exact versions. Keep the pinned app version, workflow defaults and the README aligned.
+The default Dockerfile intentionally installs unpinned packages. PySide6/Shiboken
 6.12.0 are excluded by Moleditpy 5.0.1's dependency constraints.
 
 Update the base digest separately when applying OS/Python security updates.

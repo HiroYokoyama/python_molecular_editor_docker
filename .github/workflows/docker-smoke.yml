@@ -8,14 +8,14 @@ on:
   workflow_dispatch:
     inputs:
       expected_version:
-        description: Version that both images must report
+        description: Version that the pinned image must report
         required: false
         default: '5.0.1'
         type: string
   workflow_call:
     inputs:
       expected_version:
-        description: Version that moleditpy must report
+        description: Version that the pinned image must report
         required: false
         default: '5.0.1'
         type: string
@@ -36,10 +36,12 @@ jobs:
             dockerfile: Dockerfile
             context: .
             image: moleditpy-docker-smoke-default
+            expected_version: latest
           - name: pinned image
             dockerfile: pinned-version/Dockerfile
             context: pinned-version
             image: moleditpy-docker-smoke-pinned
+            expected_version: pinned
 
     steps:
       - name: Check out source
@@ -50,5 +52,5 @@ jobs:
           DOCKERFILE: ${{ matrix.dockerfile }}
           BUILD_CONTEXT: ${{ matrix.context }}
           IMAGE: ${{ matrix.image }}
-          EXPECTED_VERSION: ${{ inputs.expected_version || '5.0.1' }}
+          EXPECTED_VERSION: ${{ matrix.expected_version == 'latest' && 'latest' || inputs.expected_version || '5.0.1' }}
         run: bash tests/docker_smoke.sh "$DOCKERFILE" "$BUILD_CONTEXT" "$IMAGE" "$EXPECTED_VERSION"

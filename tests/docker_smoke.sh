@@ -19,18 +19,20 @@ trap cleanup EXIT
 echo "Building $image from $dockerfile (context: $context)"
 docker build --pull --file "$dockerfile" --tag "$image" "$context"
 
-echo "Checking moleditpy --version"
-version_output="$(docker run --rm --entrypoint moleditpy "$image" --version 2>&1)"
-printf '%s\n' "$version_output"
-
-if ! grep --fixed-strings --line-regexp --quiet "MoleditPy $expected_version" <<<"$version_output"; then
-    echo "CLI did not report the expected version $expected_version" >&2
+actual_version="$(docker run --rm --entrypoint python "$image" -c 'from importlib.metadata import version; print(version("moleditpy"))')"
+if [[ "$expected_version" == "latest" ]]; then
+    # The rolling image follows PyPI; validate CLI/package consistency.
+    expected_version=$actual_version
+elif [[ "$actual_version" != "$expected_version" ]]; then
+    echo "Expected $expected_version, got $actual_version" >&2
     exit 1
 fi
 
-actual_version="$(docker run --rm --entrypoint python "$image" -c 'from importlib.metadata import version; print(version("moleditpy"))')"
-if [[ "$actual_version" != "$expected_version" ]]; then
-    echo "Expected $expected_version, got $actual_version" >&2
+echo "Checking moleditpy --version"
+version_output="$(docker run --rm --entrypoint moleditpy "$image" --version 2>&1)"
+printf '%s\n' "$version_output"
+if ! grep --fixed-strings --line-regexp --quiet "MoleditPy $expected_version" <<<"$version_output"; then
+    echo "CLI did not report the expected version $expected_version" >&2
     exit 1
 fi
 
