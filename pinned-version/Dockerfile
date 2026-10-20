@@ -1,6 +1,7 @@
 FROM python:3.11-slim@sha256:5e9093a415c674b51e705d42dde4dd6aad8c132dab6ca3e81ecd5cbbe3689bd2
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    libxcursor1 \
     libx11-xcb1 \
     libxcb-cursor0 \
     libgl1 \

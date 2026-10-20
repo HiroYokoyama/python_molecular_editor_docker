@@ -1,5 +1,6 @@
 """Exercise the installed Linux package, native Qt libraries and 3D rendering."""
 
+import ctypes
 from importlib import metadata
 from pathlib import Path
 import subprocess
@@ -15,6 +16,7 @@ from PySide6.QtWidgets import QApplication
 xcb = Path(QLibraryInfo.path(QLibraryInfo.LibraryPath.PluginsPath)) / "platforms" / "libqxcb.so"
 dependencies = subprocess.check_output(["ldd", str(xcb)], text=True)
 assert "not found" not in dependencies, dependencies
+ctypes.CDLL("libXcursor.so.1")  # VTK loads this library dynamically.
 
 import pyvista as pv
 from pyvistaqt import QtInteractor  # Verify QtPy selects the intended binding.
